@@ -1,10 +1,16 @@
-from sqlalchemy import delete, exists, select
+from sqlalchemy import delete, exists, select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.folder import Folder, FolderNode, FolderScript
 from app.models.node_script import NodeScript
-from app.schemas.folder import FolderCreate, FolderNodeCreate, FolderScriptCreate, NodeScriptCreate
+from app.schemas.folder import (
+    FolderCreate,
+    FolderNodeCreate,
+    FolderScriptCreate,
+    FolderUpdate,
+    NodeScriptCreate,
+)
 from app.services.exceptions import ConflictError, NotFoundError
 from app.services.trigger_service import clone_trigger
 
@@ -12,6 +18,27 @@ from app.services.trigger_service import clone_trigger
 async def create_folder(session: AsyncSession, data: FolderCreate) -> Folder:
     folder = Folder(name=data.name)
     session.add(folder)
+    await session.commit()
+    await session.refresh(folder)
+    return folder
+
+
+async def read_folder(session: AsyncSession, folder_id: int) -> Folder:
+    folder = await session.get(Folder, folder_id)
+    if folder is None:
+        raise NotFoundError(f"Folder {folder_id} not found")
+    return folder
+
+
+async def list_folders(session: AsyncSession) -> list[Folder]:
+    result = await session.execute(select(Folder).order_by(Folder.id))
+    return list(result.scalars().all())
+
+
+async def update_folder(session: AsyncSession, folder_id: int, data: FolderUpdate) -> Folder:
+    folder = await read_folder(session, folder_id)
+    folder.name = data.name
+    folder.updated_at = await _current_sqlite_timestamp(session)
     await session.commit()
     await session.refresh(folder)
     return folder
@@ -55,6 +82,18 @@ async def add_node_to_folder(
     return folder_node
 
 
+async def remove_node_from_folder(session: AsyncSession, folder_id: int, node_id: int) -> None:
+    result = await session.execute(
+        delete(FolderNode)
+        .where(FolderNode.folder_id == folder_id, FolderNode.node_id == node_id)
+        .returning(FolderNode.folder_id)
+    )
+    if result.scalar_one_or_none() is None:
+        await session.rollback()
+        raise NotFoundError(f"Folder-node link not found: folder={folder_id}, node={node_id}")
+    await session.commit()
+
+
 async def add_script_to_folder(
     session: AsyncSession,
     folder_id: int | FolderScriptCreate,
@@ -79,6 +118,18 @@ async def add_script_to_folder(
 
     await session.refresh(folder_script)
     return folder_script
+
+
+async def remove_script_from_folder(session: AsyncSession, folder_id: int, script_id: int) -> None:
+    result = await session.execute(
+        delete(FolderScript)
+        .where(FolderScript.folder_id == folder_id, FolderScript.script_id == script_id)
+        .returning(FolderScript.id)
+    )
+    if result.scalar_one_or_none() is None:
+        await session.rollback()
+        raise NotFoundError(f"Folder-script link not found: folder={folder_id}, script={script_id}")
+    await session.commit()
 
 
 async def create_node_script(session: AsyncSession, data: NodeScriptCreate) -> NodeScript:
@@ -231,3 +282,8 @@ async def _find_manual_duplicate_id(
         query = query.where(NodeScript.trigger_id == folder_link.trigger_id)
 
     return await session.scalar(query.limit(1))
+
+
+async def _current_sqlite_timestamp(session: AsyncSession) -> str:
+    result = await session.execute(text("SELECT datetime('now')"))
+    return str(result.scalar_one())

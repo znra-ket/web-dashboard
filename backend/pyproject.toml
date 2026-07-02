@@ -8,6 +8,10 @@ dependencies = [
   "sqlalchemy",
   "aiosqlite",
   "pydantic-settings",
+  "httpx",
+  "apscheduler",
+  "asyncssh",
+  "cryptography",
 ]
 
 [tool.pytest.ini_options]

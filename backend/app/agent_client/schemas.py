@@ -3,24 +3,22 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class InfoResponse(BaseModel):
+class AgentInfoResponse(BaseModel):
     agent_version: str
     api_version: int
     supported_features: list[str]
     limits: dict[str, int]
 
 
-class ScriptUploadRequest(BaseModel):
+class AgentScriptUploadRequest(BaseModel):
     script_source: str
 
-    model_config = ConfigDict(extra="ignore")
 
-
-class ScriptUploadResponse(BaseModel):
+class AgentScriptUploadResponse(BaseModel):
     hash: str
 
 
-class ScriptExecuteRequest(BaseModel):
+class AgentScriptExecuteRequest(BaseModel):
     hash: str
     request_id: UUID
     args: list[str] = Field(default_factory=list)
@@ -28,7 +26,7 @@ class ScriptExecuteRequest(BaseModel):
     timeout_seconds: int | None = None
 
 
-class ScriptExecuteResponse(BaseModel):
+class AgentScriptExecuteResponse(BaseModel):
     exit_code: int | None
     stdout: str
     stderr: str
@@ -38,30 +36,34 @@ class ScriptExecuteResponse(BaseModel):
     stderr_truncated: bool = False
 
 
-class AdminUnpairResponse(BaseModel):
+class AgentAdminUnpairResponse(BaseModel):
     agent_state: str
     removed_paths: list[str]
 
+    model_config = ConfigDict(extra="ignore")
 
-class AdminUninstallResponse(BaseModel):
+
+class AgentAdminUninstallResponse(BaseModel):
     agent_state: str
     dry_run: bool
     planned_paths: list[str]
     removed_paths: list[str]
 
+    model_config = ConfigDict(extra="ignore")
 
-class BootstrapStatusResponse(BaseModel):
+
+class AgentBootstrapStatusResponse(BaseModel):
     status: str
     expires_at: str | None
 
 
-class BootstrapCsrResponse(BaseModel):
+class AgentBootstrapCsrResponse(BaseModel):
     csr: str
 
 
-class BootstrapCertificateRequest(BaseModel):
+class AgentBootstrapCertificateRequest(BaseModel):
     certificate_pem: str
 
 
-class BootstrapCertificateResponse(BaseModel):
+class AgentBootstrapCertificateResponse(BaseModel):
     status: str

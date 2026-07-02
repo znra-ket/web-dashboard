@@ -79,6 +79,7 @@ class MigrationRunnerTests(unittest.IsolatedAsyncioTestCase):
                         "trigger_schedule",
                         "trigger_on_startup",
                         "node_hash_gc",
+                        "node_bootstrap_token",
                     }.issubset(tables)
                 )
                 self.assertIn("trigger", node_script_fk_tables)

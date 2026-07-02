@@ -1,5 +1,6 @@
 from collections.abc import AsyncIterator
 
+from fastapi import Request
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
@@ -45,8 +46,9 @@ def get_session_maker(database_url: str | None = None) -> async_sessionmaker[Asy
     return _session_maker
 
 
-async def get_session() -> AsyncIterator[AsyncSession]:
-    async_session = get_session_maker()
+async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
+    settings = request.app.state.settings
+    async_session = get_session_maker(settings.database_url)
     async with async_session() as session:
         yield session
 

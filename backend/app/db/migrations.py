@@ -319,4 +319,27 @@ MIGRATIONS: tuple[Migration, ...] = (
             """,
         ),
     ),
+    Migration(
+        version="0008_node_bootstrap_token",
+        description="Create node bootstrap token lifecycle table",
+        statements=(
+            """
+            CREATE TABLE IF NOT EXISTS node_bootstrap_token (
+              id INTEGER PRIMARY KEY,
+              node_id INTEGER NOT NULL REFERENCES node(id) ON DELETE CASCADE,
+              token_hash TEXT NOT NULL,
+              expires_at TEXT NOT NULL,
+              bootstrap_window_expires_at TEXT NOT NULL,
+              status TEXT NOT NULL DEFAULT 'pending'
+                CHECK (status IN ('pending', 'consumed', 'expired', 'cancelled')),
+              created_at TEXT NOT NULL DEFAULT (datetime('now')),
+              updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+            """,
+            """
+            CREATE INDEX IF NOT EXISTS ix_node_bootstrap_token_node_status
+            ON node_bootstrap_token(node_id, status)
+            """,
+        ),
+    ),
 )
