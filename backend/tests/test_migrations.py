@@ -59,6 +59,10 @@ class MigrationRunnerTests(unittest.IsolatedAsyncioTestCase):
                         text("PRAGMA foreign_key_list(folder_script)")
                     )
                     folder_script_fk_tables = {row[2] for row in folder_script_fk_result.all()}
+                    sqlite_triggers_result = await connection.execute(
+                        text("SELECT name FROM sqlite_master WHERE type = 'trigger'")
+                    )
+                    sqlite_triggers = {row[0] for row in sqlite_triggers_result.all()}
 
                 self.assertEqual(first_run, [migration.version for migration in MIGRATIONS])
                 self.assertEqual(second_run, [])
@@ -74,10 +78,23 @@ class MigrationRunnerTests(unittest.IsolatedAsyncioTestCase):
                         "trigger",
                         "trigger_schedule",
                         "trigger_on_startup",
+                        "node_hash_gc",
                     }.issubset(tables)
                 )
                 self.assertIn("trigger", node_script_fk_tables)
                 self.assertIn("trigger", folder_script_fk_tables)
+                self.assertTrue(
+                    {
+                        "trg_folder_node_fanout",
+                        "trg_folder_script_fanout",
+                        "trg_folder_node_revoke",
+                        "trg_folder_script_revoke",
+                        "trg_cleanup_orphan_trigger_ns_del",
+                        "trg_cleanup_orphan_trigger_ns_upd",
+                        "trg_cleanup_orphan_trigger_fs_del",
+                        "trg_cleanup_orphan_trigger_fs_upd",
+                    }.issubset(sqlite_triggers)
+                )
                 self.assertTrue(
                     {
                         "ux_node_script_folder",

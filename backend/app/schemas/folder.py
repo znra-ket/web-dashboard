@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import AliasChoices, BaseModel, Field
 
 
 class FolderCreate(BaseModel):
@@ -13,7 +13,14 @@ class FolderNodeCreate(BaseModel):
 class FolderScriptCreate(BaseModel):
     folder_id: int
     script_id: int
-    trigger_id: int | None = None
+    template_trigger_id: int | None = Field(
+        default=None,
+        validation_alias=AliasChoices("template_trigger_id", "trigger_id"),
+    )
+
+    @property
+    def trigger_id(self) -> int | None:
+        return self.template_trigger_id
 
 
 class NodeScriptCreate(BaseModel):

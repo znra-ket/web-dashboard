@@ -204,4 +204,119 @@ MIGRATIONS: tuple[Migration, ...] = (
             """,
         ),
     ),
+    Migration(
+        version="0005_folder_materialization_triggers",
+        description="Materialize folder links into node_script rows",
+        statements=(
+            """
+            CREATE TRIGGER IF NOT EXISTS trg_folder_node_fanout
+            AFTER INSERT ON folder_node
+            BEGIN
+              INSERT OR IGNORE INTO node_script (node_id, script_id, folder_id, trigger_id)
+              SELECT NEW.node_id, fs.script_id, NEW.folder_id, NULL
+              FROM folder_script fs
+              WHERE fs.folder_id = NEW.folder_id;
+            END
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS trg_folder_script_fanout
+            AFTER INSERT ON folder_script
+            BEGIN
+              INSERT OR IGNORE INTO node_script (node_id, script_id, folder_id, trigger_id)
+              SELECT fn.node_id, NEW.script_id, NEW.folder_id, NULL
+              FROM folder_node fn
+              WHERE fn.folder_id = NEW.folder_id;
+            END
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS trg_folder_node_revoke
+            AFTER DELETE ON folder_node
+            BEGIN
+              DELETE FROM node_script
+              WHERE node_id = OLD.node_id
+                AND folder_id = OLD.folder_id;
+            END
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS trg_folder_script_revoke
+            AFTER DELETE ON folder_script
+            BEGIN
+              DELETE FROM node_script
+              WHERE script_id = OLD.script_id
+                AND folder_id = OLD.folder_id;
+            END
+            """,
+        ),
+    ),
+    Migration(
+        version="0006_orphan_trigger_cleanup",
+        description="Cleanup trigger rows when link ownership is removed",
+        statements=(
+            """
+            CREATE TRIGGER IF NOT EXISTS trg_cleanup_orphan_trigger_ns_del
+            AFTER DELETE ON node_script
+            WHEN OLD.trigger_id IS NOT NULL
+            BEGIN
+              DELETE FROM trigger
+              WHERE id = OLD.trigger_id
+                AND NOT EXISTS (SELECT 1 FROM node_script WHERE trigger_id = OLD.trigger_id)
+                AND NOT EXISTS (SELECT 1 FROM folder_script WHERE trigger_id = OLD.trigger_id);
+            END
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS trg_cleanup_orphan_trigger_ns_upd
+            AFTER UPDATE OF trigger_id ON node_script
+            WHEN OLD.trigger_id IS NOT NULL AND OLD.trigger_id IS NOT NEW.trigger_id
+            BEGIN
+              DELETE FROM trigger
+              WHERE id = OLD.trigger_id
+                AND NOT EXISTS (SELECT 1 FROM node_script WHERE trigger_id = OLD.trigger_id)
+                AND NOT EXISTS (SELECT 1 FROM folder_script WHERE trigger_id = OLD.trigger_id);
+            END
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS trg_cleanup_orphan_trigger_fs_del
+            AFTER DELETE ON folder_script
+            WHEN OLD.trigger_id IS NOT NULL
+            BEGIN
+              DELETE FROM trigger
+              WHERE id = OLD.trigger_id
+                AND NOT EXISTS (SELECT 1 FROM node_script WHERE trigger_id = OLD.trigger_id)
+                AND NOT EXISTS (SELECT 1 FROM folder_script WHERE trigger_id = OLD.trigger_id);
+            END
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS trg_cleanup_orphan_trigger_fs_upd
+            AFTER UPDATE OF trigger_id ON folder_script
+            WHEN OLD.trigger_id IS NOT NULL AND OLD.trigger_id IS NOT NEW.trigger_id
+            BEGIN
+              DELETE FROM trigger
+              WHERE id = OLD.trigger_id
+                AND NOT EXISTS (SELECT 1 FROM node_script WHERE trigger_id = OLD.trigger_id)
+                AND NOT EXISTS (SELECT 1 FROM folder_script WHERE trigger_id = OLD.trigger_id);
+            END
+            """,
+        ),
+    ),
+    Migration(
+        version="0007_node_hash_gc_queue",
+        description="Create local node hash GC queue",
+        statements=(
+            """
+            CREATE TABLE IF NOT EXISTS node_hash_gc (
+              id INTEGER PRIMARY KEY,
+              node_id INTEGER NOT NULL REFERENCES node(id) ON DELETE CASCADE,
+              hash TEXT NOT NULL,
+              reason TEXT NOT NULL,
+              status TEXT NOT NULL DEFAULT 'pending'
+                CHECK (status IN ('pending', 'done', 'cancelled', 'failed')),
+              attempts INTEGER NOT NULL DEFAULT 0,
+              last_attempt_at TEXT,
+              created_at TEXT NOT NULL DEFAULT (datetime('now')),
+              updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+              UNIQUE (node_id, hash)
+            )
+            """,
+        ),
+    ),
 )
