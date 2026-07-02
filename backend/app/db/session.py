@@ -1,5 +1,6 @@
 from collections.abc import AsyncIterator
 
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.config import get_settings
@@ -13,10 +14,25 @@ def get_engine(database_url: str | None = None) -> AsyncEngine:
     global _engine, _engine_url, _session_maker
     resolved_url = database_url or get_settings().database_url
     if _engine is None or _engine_url != resolved_url:
-        _engine = create_async_engine(resolved_url, future=True)
+        _engine = create_database_engine(resolved_url)
         _engine_url = resolved_url
         _session_maker = None
     return _engine
+
+
+def create_database_engine(database_url: str) -> AsyncEngine:
+    engine = create_async_engine(database_url, future=True)
+    if database_url.startswith("sqlite+aiosqlite"):
+        _enable_sqlite_foreign_keys(engine)
+    return engine
+
+
+def _enable_sqlite_foreign_keys(engine: AsyncEngine) -> None:
+    @event.listens_for(engine.sync_engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record) -> None:  # type: ignore[no-untyped-def]
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 
 def get_session_maker(database_url: str | None = None) -> async_sessionmaker[AsyncSession]:
