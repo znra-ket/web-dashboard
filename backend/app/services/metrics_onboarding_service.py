@@ -83,14 +83,13 @@ class Stage3MetricsOnboardingService:
 
         try:
             scripts = await seed_metrics_scripts(self._session)
+            await self._create_metric_bindings(node, scripts)
             for script in scripts:
                 uploaded = await self._agent_client.upload_script(node, script.content)
                 if uploaded.hash != script.current_hash:
                     raise AgentIntegrityMismatchError(
                         f"Metrics script upload hash mismatch: {script.name}"
                     )
-
-            await self._create_metric_bindings(node, scripts)
         except (AgentClientError, ConflictError, IntegrityError) as exc:
             await self._mark_failed(node)
             if isinstance(exc, IntegrityError):

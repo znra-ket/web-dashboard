@@ -100,7 +100,7 @@ class Stage3MetricsOnboardingTests(unittest.IsolatedAsyncioTestCase):
             links = await _node_scripts(session)
 
         self.assertEqual(loaded.lifecycle_status, NodeLifecycleStatus.FAILED_METRICS_UPLOAD.value)
-        self.assertEqual(links, [])
+        self.assertEqual(len(links), 3)
 
 
 class FakeMetricsAgentClient:

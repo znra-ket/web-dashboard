@@ -12,10 +12,31 @@ from app.services.folder_service import (
 )
 from app.services.gc_service import desired_hashes, enqueue_hash_gc_if_not_desired
 from app.services.node_service import create_node, list_nodes, read_node
+from app.services.node_deletion_service import (
+    OFFLINE_DELETE_WARNING,
+    NodeDeletionResult,
+    NodeDeletionService,
+)
 from app.services.bootstrap_token_service import issue_bootstrap_token, verify_bootstrap_token
 from app.services.mtls_onboarding_service import MtlsProbeService, Stage2MtlsOnboardingService
 from app.services.metrics_onboarding_service import Stage3MetricsOnboardingService, seed_metrics_scripts
 from app.services.onboarding_service import Stage1OnboardingService
+from app.services.pipeline_service import (
+    archive_pipeline,
+    create_pipeline,
+    create_pipeline_step,
+    create_pipeline_step_arg,
+    delete_pipeline_step,
+    delete_pipeline_step_arg,
+    list_pipeline_step_args,
+    list_pipeline_steps,
+    list_pipelines,
+    read_pipeline,
+    read_pipeline_step,
+    update_pipeline,
+    update_pipeline_step,
+    update_pipeline_step_arg,
+)
 from app.services.script_service import create_script, list_scripts, read_script, update_script_content
 from app.services.trigger_service import (
     clone_trigger,
@@ -41,6 +62,9 @@ __all__ = [
     "desired_hashes",
     "enqueue_hash_gc_if_not_desired",
     "create_node",
+    "NodeDeletionService",
+    "NodeDeletionResult",
+    "OFFLINE_DELETE_WARNING",
     "issue_bootstrap_token",
     "verify_bootstrap_token",
     "Stage1OnboardingService",
@@ -48,6 +72,20 @@ __all__ = [
     "Stage3MetricsOnboardingService",
     "seed_metrics_scripts",
     "MtlsProbeService",
+    "create_pipeline",
+    "read_pipeline",
+    "list_pipelines",
+    "update_pipeline",
+    "archive_pipeline",
+    "create_pipeline_step",
+    "read_pipeline_step",
+    "list_pipeline_steps",
+    "update_pipeline_step",
+    "delete_pipeline_step",
+    "create_pipeline_step_arg",
+    "list_pipeline_step_args",
+    "update_pipeline_step_arg",
+    "delete_pipeline_step_arg",
     "read_node",
     "list_nodes",
     "create_script",

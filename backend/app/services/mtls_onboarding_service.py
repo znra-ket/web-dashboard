@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
 
+from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.node import Node, NodeLifecycleStatus
@@ -78,3 +79,15 @@ class MtlsProbeService:
         if node.agent_cert_fingerprint != result.peer_certificate_fingerprint:
             raise AgentIntegrityMismatchError("mTLS probe failed: peer certificate fingerprint mismatch")
         return True
+
+    async def is_active_fingerprint_trusted(self, fingerprint: str) -> bool:
+        return bool(
+            await self._session.scalar(
+                select(
+                    exists().where(
+                        Node.lifecycle_status == NodeLifecycleStatus.ACTIVE.value,
+                        Node.agent_cert_fingerprint == fingerprint,
+                    )
+                )
+            )
+        )

@@ -342,4 +342,86 @@ MIGRATIONS: tuple[Migration, ...] = (
             """,
         ),
     ),
+    Migration(
+        version="0009_pipeline_schema",
+        description="Create pipeline schema and materialize pipeline steps",
+        statements=(
+            """
+            CREATE TABLE IF NOT EXISTS pipeline (
+              id INTEGER PRIMARY KEY,
+              name TEXT NOT NULL,
+              archived INTEGER NOT NULL DEFAULT 0 CHECK (archived IN (0, 1)),
+              created_at TEXT NOT NULL DEFAULT (datetime('now')),
+              updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+            """,
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS ux_pipeline_name_active
+            ON pipeline(name)
+            WHERE archived = 0
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS pipeline_step (
+              id INTEGER PRIMARY KEY,
+              pipeline_id INTEGER NOT NULL REFERENCES pipeline(id) ON DELETE CASCADE,
+              position INTEGER NOT NULL CHECK (position > 0),
+              node_id INTEGER NOT NULL REFERENCES node(id) ON DELETE CASCADE,
+              script_id INTEGER NOT NULL REFERENCES script(id) ON DELETE CASCADE,
+              UNIQUE (pipeline_id, position)
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS pipeline_step_arg (
+              id INTEGER PRIMARY KEY,
+              step_id INTEGER NOT NULL REFERENCES pipeline_step(id) ON DELETE CASCADE,
+              arg_index INTEGER NOT NULL CHECK (arg_index >= 0),
+              source_type TEXT NOT NULL CHECK (source_type IN ('literal', 'step_output')),
+              literal_value TEXT,
+              source_step_id INTEGER REFERENCES pipeline_step(id) ON DELETE RESTRICT,
+              json_field TEXT,
+              UNIQUE (step_id, arg_index)
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS pipeline_run (
+              id INTEGER PRIMARY KEY,
+              pipeline_id INTEGER NOT NULL REFERENCES pipeline(id) ON DELETE CASCADE,
+              status TEXT NOT NULL CHECK (status IN ('pending', 'running', 'succeeded', 'failed', 'cancelled')),
+              started_at TEXT,
+              finished_at TEXT,
+              error TEXT,
+              created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS pipeline_run_step (
+              id INTEGER PRIMARY KEY,
+              pipeline_run_id INTEGER NOT NULL REFERENCES pipeline_run(id) ON DELETE CASCADE,
+              step_id INTEGER NOT NULL,
+              node_id INTEGER NOT NULL,
+              script_id INTEGER NOT NULL,
+              resolved_args TEXT NOT NULL,
+              request_id TEXT NOT NULL,
+              status TEXT NOT NULL CHECK (status IN ('pending', 'running', 'succeeded', 'failed', 'skipped')),
+              started_at TEXT,
+              finished_at TEXT,
+              exit_code INTEGER,
+              stdout TEXT,
+              stderr TEXT,
+              timed_out INTEGER NOT NULL DEFAULT 0 CHECK (timed_out IN (0, 1)),
+              error TEXT,
+              duration_ms INTEGER,
+              UNIQUE (pipeline_run_id, step_id)
+            )
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS trg_pipeline_step_materialize_node_script
+            AFTER INSERT ON pipeline_step
+            BEGIN
+              INSERT OR IGNORE INTO node_script (node_id, script_id, folder_id, trigger_id)
+              VALUES (NEW.node_id, NEW.script_id, NULL, NULL);
+            END
+            """,
+        ),
+    ),
 )

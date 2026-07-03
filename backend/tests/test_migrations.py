@@ -80,6 +80,11 @@ class MigrationRunnerTests(unittest.IsolatedAsyncioTestCase):
                         "trigger_on_startup",
                         "node_hash_gc",
                         "node_bootstrap_token",
+                        "pipeline",
+                        "pipeline_step",
+                        "pipeline_step_arg",
+                        "pipeline_run",
+                        "pipeline_run_step",
                     }.issubset(tables)
                 )
                 self.assertIn("trigger", node_script_fk_tables)
@@ -94,6 +99,7 @@ class MigrationRunnerTests(unittest.IsolatedAsyncioTestCase):
                         "trg_cleanup_orphan_trigger_ns_upd",
                         "trg_cleanup_orphan_trigger_fs_del",
                         "trg_cleanup_orphan_trigger_fs_upd",
+                        "trg_pipeline_step_materialize_node_script",
                     }.issubset(sqlite_triggers)
                 )
                 self.assertTrue(
