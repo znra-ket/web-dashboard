@@ -1,0 +1,225 @@
+{
+  "main": {
+    "id": "0e8b47b7097bff43",
+    "type": "split",
+    "children": [
+      {
+        "id": "d36f73ac9f2ae147",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4ffcd2ed79b182f4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "webxray_prompt_pack_v3_4_local_layout.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "webxray_prompt_pack_v3_4_local_layout"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "9b35e4c3690d3760",
+    "type": "split",
+    "children": [
+      {
+        "id": "efaf6936a4994c35",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b9e2d0947efa58a8",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Файловый менеджер"
+            }
+          },
+          {
+            "id": "719e5e4dcb146a85",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Поиск"
+            }
+          },
+          {
+            "id": "8e2774fb8b109d42",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Закладки"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "57de62879c485181",
+    "type": "split",
+    "children": [
+      {
+        "id": "1c29af6e756a9542",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "dc1b27044cef0143",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "webxray_prompt_pack_v3_4_local_layout.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Обратные ссылки для webxray_prompt_pack_v3_4_local_layout"
+            }
+          },
+          {
+            "id": "65dc65781d01cc37",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Полное описание идеи проекта.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Исходящие ссылки из Полное описание идеи проекта"
+            }
+          },
+          {
+            "id": "545b969b59dba530",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Теги"
+            }
+          },
+          {
+            "id": "c9f65d1d9cea575f",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Все свойства"
+            }
+          },
+          {
+            "id": "104c91dccbbd07c0",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Полное описание идеи проекта.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Структура Полное описание идеи проекта"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Меню быстрого перехода": false,
+      "graph:Граф": false,
+      "canvas:Создать новый холст": false,
+      "daily-notes:Сегодняшняя заметка": false,
+      "templates:Вставить шаблон": false,
+      "command-palette:Открыть палитру команд": false,
+      "bases:Создать новую базу": false,
+      "obsidian-excalidraw-plugin:Создать новый чертеж": false
+    }
+  },
+  "active": "4ffcd2ed79b182f4",
+  "lastOpenFiles": [
+    "MASTER_SESSION_PROMPT.md",
+    "implementation/COMPACT_HANDOFF.md",
+    "implementation/OPEN_RISKS.md",
+    "implementation/NEXT_PROMPT.md",
+    "implementation/CURRENT_STATE.md",
+    "Transactional service boundaries.md",
+    "webxray_prompt_pack_v3_4_local_layout.md",
+    "agent/tests/__pycache__/test_bootstrap_api.cpython-312-pytest-9.1.1.pyc",
+    "agent/tests/test_bootstrap_api.py",
+    "agent/webxray_agent/__pycache__/admin.cpython-312.pyc",
+    "agent/tests/__pycache__/test_agent_admin.cpython-312-pytest-9.1.1.pyc",
+    "agent/webxray_agent/admin.py",
+    "agent/tests/test_agent_admin.py",
+    "agent/webxray_agent/__pycache__/executor.cpython-312.pyc",
+    "agent/webxray_agent/executor.py",
+    "agent/tests/__pycache__/test_agent_execute_endpoint.cpython-312-pytest-9.1.1.pyc",
+    "agent/tests/__pycache__/test_executor_safety.cpython-312-pytest-9.1.1.pyc",
+    "implementation/TRANSACTION_CONTRACT_PLAN.md",
+    "README.md",
+    "implementation/PHASE_GATES.md",
+    "implementation/CONFLICTS.md",
+    "implementation/BLOCKING_REQUIREMENTS.md",
+    "implementation/PROMPT_COVERAGE.md",
+    "implementation/TRACEABILITY.md",
+    "implementation/INVARIANTS.md",
+    "implementation/README.md",
+    "implementation/DOC_SOURCE_MANIFEST.md",
+    "ARCHITECTURE_INDEX.md",
+    "webxray_prompt_pack_v3_2_reviewed.md",
+    "Скрипты и папки/Триггеры запуска скриптов.md",
+    "Основное/web-xray-dashboard — Основной дизайн-документ.md",
+    "webxray_prompt_pack_v2.md",
+    "✍️Заметки/Без названия.md",
+    "Основное/Онбординг ноды в дашборд.md",
+    "Агент/Установка mTLS соединения дашборд - агент.md",
+    "Скрипты и папки/Пайплайны и их архитектура.md"
+  ]
+}
